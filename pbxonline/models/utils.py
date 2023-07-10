@@ -50,8 +50,10 @@ def construct_error_from_data(data: dict) -> 'BaseModel':
         # We need to check for both.
         if 'error_message' in data:
             error_message = data['error_message']
-        else:
+        elif 'error' in data and 'errorMessage' in data['error']:
             error_message = data['error']['errorMessage']
+        else:
+            error_message = 'Unknown error'
         
     except KeyError as e:
         raise KeyError(f'Cannot construct error object from data. Missing key: {e}')
