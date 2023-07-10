@@ -6,3 +6,4 @@ pbxonline/cache/*
 Pipfile.lock
 dist
 python_pbxonline_api.egg-info
+notes.txt

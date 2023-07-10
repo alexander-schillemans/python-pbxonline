@@ -86,8 +86,6 @@ class PBXOnlineAPI:
         else:
             request_url = url
 
-        print(f'Making {method} request to {request_url} with data: {data} and headers: {headers}')
-        
         if method == 'GET':
             response = requests.get(request_url, params=data, headers=headers)
         elif method == 'POST':
@@ -121,8 +119,6 @@ class PBXOnlineAPI:
         response = self._do_request(method, url, data, headers, **kwargs)
         response_type = response.headers.get('Content-Type', '')
         resp_content = response.json() if 'text/json' in response_type else response.content
-        
-        print(f'Response: {response.status_code} - {resp_content}')
         
         # Unauthorized, token is not valid anymore
         if response.status_code == 401: 

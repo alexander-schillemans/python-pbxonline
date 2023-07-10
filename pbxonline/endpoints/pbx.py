@@ -14,5 +14,5 @@ class PBXEndpoint(APIEndpoint):
         
         status, headers, resp_json = self.api.get( f'{self.endpoint}/sipaccount')
         if status > 299: return construct_error_from_data(resp_json)
-        
+
         return construct_object_from_data(resp_json['results'])
