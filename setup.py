@@ -7,8 +7,8 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-  name = 'python-pbxobline',         
-  packages=['pbxobline', 'pbxobline.models', 'pbxobline.constants', 'pbxobline.endpoints'],
+  name = 'python-pbxonline',         
+  packages=['pbxonline', 'pbxonline.models', 'pbxonline.constants', 'pbxonline.endpoints'],
   version = '0.1.0',
   license='GPL-3.0-or-later',
   description = 'Wrapper for PBX Online API',
