@@ -92,11 +92,13 @@ class PBXOnlineAPI:
             response = requests.post(request_url, data=json.dumps(data), headers=headers)
         elif method == 'PUT':
             response = requests.put(request_url, data=json.dumps(data), headers=headers)
+        elif method == 'DELETE':
+            response = requests.delete(request_url, data=json.dumps(data), headers=headers)
         
         return response
 
 
-    def _request(self, method: Literal['GET', 'POST', 'PUT'], url: str, data: Optional[dict] = None, headers: Optional[dict] = None, **kwargs: dict) -> Tuple[int, dict, dict]:
+    def _request(self, method: Literal['GET', 'POST', 'PUT', 'DELETE'], url: str, data: Optional[dict] = None, headers: Optional[dict] = None, **kwargs: dict) -> Tuple[int, dict, dict]:
         """ Checks the header tokens and then carries out the request.
         Returns the status code, returned headers and content. 
         
@@ -160,4 +162,9 @@ class PBXOnlineAPI:
     def put(self, url: str, data: Optional[dict] = None, headers: Optional[dict] = None, **kwargs: dict) -> Tuple[int, dict, dict]:
         """ Makes a PUT request to the given URL, with the given data and headers. """
         status, headers, response = self._request('PUT', url, data, headers, **kwargs)
+        return status, headers, response
+    
+    def delete(self, url: str, data: Optional[dict] = None, headers: Optional[dict] = None, **kwargs: dict) -> Tuple[int, dict, dict]:
+        """ Makes a DELETE request to the given URL, with the given data and headers. """
+        status, headers, response = self._request('DELETE', url, data, headers, **kwargs)
         return status, headers, response
