@@ -16,3 +16,10 @@ class PBXEndpoint(APIEndpoint):
         if status > 299: return construct_error_from_data(resp_json)
 
         return construct_object_from_data(resp_json['results'])
+    
+    def get_did_numbers(self) -> ObjectListModel:
+        
+        status, headers, resp_json = self.api.get( f'{self.endpoint}/did')
+        if status > 299: return construct_error_from_data(resp_json)
+
+        return construct_object_from_data(resp_json['results'])
