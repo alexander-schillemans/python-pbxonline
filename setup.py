@@ -9,7 +9,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
   name = 'python-pbxonline',         
   packages=['pbxonline', 'pbxonline.models', 'pbxonline.constants', 'pbxonline.endpoints', 'pbxonline.cache'],
-  version = '0.1.3',
+  version = '0.2.0',
   license='GPL-3.0-or-later',
   description = 'Wrapper for PBX Online API',
   long_description=long_description,
@@ -17,7 +17,7 @@ setup(
   author = 'Alexander Schillemans',
   author_email = 'alexander.schillemans@hotmail.com',
   url = 'https://github.com/alexanderlhsglobal/python-pbxonline',
-  download_url = 'https://github.com/alexanderlhsglobal/python-pbxonline/archive/refs/tags/0.1.3.tar.gz',
+  download_url = 'https://github.com/alexanderlhsglobal/python-pbxonline/archive/refs/tags/0.2.0.tar.gz',
   keywords = ['pbxonline'],
   install_requires=[
           'requests',
