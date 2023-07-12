@@ -68,9 +68,25 @@ class PBXOnlineAPI:
         response_type = response.headers.get('Content-Type', '')
         response_content_decoded = response.content.decode('utf-8')
         
-        # Remove the first part of the response if it's not JSON
-        # Sometimes the API returns a response that starts with html. To get a valid JSON response, we need to remove the html part.
-        resp_content = response_content_decoded[response_content_decoded.find('{'):]
+        if 'text/json' in response_type:
+            
+            # Remove the first part of the response if it's not JSON
+            # Sometimes the API returns a response that starts with html. To get a valid JSON response, we need to remove the html part.
+    
+            # Find the index of the first square bracket or curly bracket
+            # If the square bracket is before the curly bracket, use that index. Otherwise, use the curly bracket index.
+            square_brackets_index = response_content_decoded.find('[')
+            curly_brackets_index = response_content_decoded.find('{')
+            if(square_brackets_index < curly_brackets_index and square_brackets_index != -1):
+                index = square_brackets_index
+            elif(curly_brackets_index != -1):
+                index = curly_brackets_index
+            else:
+                index = 0
+            
+            resp_content = response_content_decoded[index:]
+        else:
+            resp_content = response_content_decoded
         
         # If the response is JSON, parse it to a dict
         resp_content = json.loads(resp_content) if 'text/json' in response_type else resp_content
