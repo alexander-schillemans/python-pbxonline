@@ -49,6 +49,27 @@ class AuthHandler:
         tokens = self._authenticate()
         return tokens
     
+    def refresh_tokens(self) -> None:
+        """ Refreshes the tokens for the user. Uses the refresh token from the cache. If not found, authenticates again using the API id and key. Sets the new Bearer token in the headers for the next requests. """
+        
+        refresh_token = self.get_token_from_cache('refresh_token')
+            
+        # If we have a refresh token, get a new access token with it
+        if refresh_token:
+            auth_tokens = self._get_tokens_from_refresh_token(refresh_token)
+            
+            if not auth_tokens:
+                # Delete cache and get new tokens
+                # This will force new tokens without the cached refresh token
+                self._cache_handler.delete(self._api_id)
+                auth_tokens = self.get_tokens()
+        else:
+            # No refresh token, get new tokens with username and password
+            auth_tokens = self.get_tokens()
+
+        # Set the new token in the headers
+        self._api._set_token_header(auth_tokens.get('token'))
+    
     def _make_auth_request(self, type: Literal['token', 'refresh_token'], params: dict) -> dict:
         """ Makes a request to the authentication server. """
         

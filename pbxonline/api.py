@@ -1,6 +1,7 @@
 import requests
 import json
 from typing import Tuple, Optional, Literal
+import re
 
 from . import config
 from .auth_handler import AuthHandler
@@ -61,6 +62,21 @@ class PBXOnlineAPI:
         tmp_headers.update(headers)
         return tmp_headers
 
+    def _parse_response_content(self, response: requests.Response) -> dict | str:
+        """ Parses the response content to a dict if the response is JSON, otherwise returns the response content as a string. """
+        
+        response_type = response.headers.get('Content-Type', '')
+        response_content_decoded = response.content.decode('utf-8')
+        
+        # Remove the first part of the response if it's not JSON
+        # Sometimes the API returns a response that starts with html. To get a valid JSON response, we need to remove the html part.
+        resp_content = response_content_decoded[response_content_decoded.find('{'):]
+        
+        # If the response is JSON, parse it to a dict
+        resp_content = json.loads(resp_content) if 'text/json' in response_type else resp_content
+        
+        return resp_content
+
     def _do_request(self, method: Literal['GET', 'POST', 'PUT'], url: str, data: Optional[dict] = None, headers: Optional[dict] = None, prepend_base_to_url: Optional[bool] = True) -> requests.Response:
         """ Makes a request to the given url, with the given method and data; updates headers with new values if given.
         By default, the BASE_URL is prepended to the URL. If the arg "prepend_base_to_url" is set to False, it will not be prepended.
@@ -119,33 +135,17 @@ class PBXOnlineAPI:
 
         # Make the request
         response = self._do_request(method, url, data, headers, **kwargs)
-        response_type = response.headers.get('Content-Type', '')
-        resp_content = response.json() if 'text/json' in response_type else response.content
+        resp_content = self._parse_response_content(response)
         
         # Unauthorized, token is not valid anymore
-        if response.status_code == 401: 
-            refresh_token = self._auth_handler.get_token_from_cache('refresh_token')
+        if response.status_code == 401:
             
-            # If we have a refresh token, get a new access token with it
-            if refresh_token:
-                auth_tokens = self._auth_handler._get_tokens_from_refresh_token(refresh_token)
-                
-                if not auth_tokens:
-                    # Delete cache and get new tokens
-                    # This will force new tokens without the cached refresh token
-                    self._cache_handler.delete(self._api_id)
-                    auth_tokens = self._auth_handler.get_tokens()
-            else:
-                # No refresh token, get new tokens with username and password
-                auth_tokens = self._auth_handler.get_tokens()
-
-            # Set the new token in the headers
-            self._set_token_header(auth_tokens.get('token'))
+            # Force new tokens
+            self._auth_handler.refresh_tokens()
             
             # Resend request after forcing new tokens
             response = self._do_request(method, url, data, headers, **kwargs)
-            response_type = response.headers.get('Content-Type', '')
-            resp_content = response.json() if 'text/json' in response_type else response.content
+            resp_content = self._parse_response_content(response)
             
         return response.status_code, response.headers, resp_content
     
